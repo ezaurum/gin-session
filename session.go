@@ -1,43 +1,61 @@
 package session
 
-import "github.com/bwmarrin/snowflake"
+import (
+	"github.com/bwmarrin/snowflake"
+	"github.com/patrickmn/go-cache"
+	"time"
+)
 
 type Manager interface {
 	GetNew() Session
+	Get(id string) (Session, bool)
 }
 
 type Session interface {
-	ID() int64
+	ID() string
 }
 
 var _ Manager = DefaultSessionManager{}
 var _ Session = DefaultSession{}
-
-type DefaultSessionManager struct {
-	generator *snowflake.Node
-}
 
 func Default() Manager {
 	node, err := snowflake.NewNode(0)
 	if nil != err {
 		panic(err)
 	}
+	c := cache.New(5*time.Minute, 10*time.Minute)
+
 	return DefaultSessionManager{
 		generator:node,
+		cache:c,
 	}
 }
 
-func (manager DefaultSessionManager) GetNew() Session {
-	id := manager.generator.Generate().Int64()
-	return DefaultSession{
+type DefaultSessionManager struct {
+	generator *snowflake.Node
+	cache     *cache.Cache
+}
+
+func (sm DefaultSessionManager) GetNew() Session {
+	id := sm.generator.Generate().String()
+	s := DefaultSession{
 		id:id,
 	}
+
+	sm.cache.Set(id, s, cache.DefaultExpiration)
+
+	return s
+}
+
+func (sm DefaultSessionManager) Get(id string) (Session, bool) {
+	s, e := sm.cache.Get(id)
+	return s.(Session), e
 }
 
 type DefaultSession struct {
-	id int64
+	id string
 }
 
-func (s DefaultSession) ID() int64 {
+func (s DefaultSession) ID() string {
 	return s.id
 }

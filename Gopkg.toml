@@ -24,3 +24,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/bwmarrin/snowflake"
+
+[[constraint]]
+  name = "github.com/patrickmn/go-cache"
+  version = "2.1.0"
