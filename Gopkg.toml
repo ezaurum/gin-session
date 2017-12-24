@@ -31,8 +31,8 @@
 
 [[constraint]]
   name = "github.com/gin-gonic/gin"
-  version = "master"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/ezaurum/session"
-  version = "master"
+  branch = "master"
