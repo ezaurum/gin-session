@@ -17,7 +17,7 @@ func TestCookie(t *testing.T) {
 	r.Use(authenticator.Handler())
 
 	r.GET("/", func(c *gin.Context) {
-		s := c.MustGet(session.DefaultSessionContextKey).(session.Session)
+		s := c.MustGet(DefaultSessionContextKey).(session.Session)
 		c.String(http.StatusOK, s.ID())
 	})
 

@@ -9,7 +9,10 @@ import (
 
 var _ gs.Authenticator = cookieAuthenticator{}
 
-const cookieName = "ca-default-name"
+const (
+	DefaultSessionContextKey = "default session context key"
+	cookieName = "ca-default-name"
+)
 
 func Default() gs.Authenticator {
 	return New(memstore.Default())
@@ -45,6 +48,6 @@ func (ca cookieAuthenticator) Handler() gin.HandlerFunc {
 			session = s
 		}
 
-		c.Set(gs.DefaultSessionContextKey, session)
+		c.Set(DefaultSessionContextKey, session)
 	}
 }
