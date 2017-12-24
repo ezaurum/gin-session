@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http/httptest"
 	"net/http"
-	"github.com/ezaurum/gin-session"
+	"github.com/ezaurum/session"
 	"strings"
 )
 
