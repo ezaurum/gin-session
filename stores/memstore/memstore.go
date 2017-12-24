@@ -5,23 +5,28 @@ import (
 	"time"
 	"github.com/ezaurum/gin-session"
 	"github.com/ezaurum/gin-session/generators/snowflake"
+	"github.com/ezaurum/gin-session/generators"
 )
 
 var _ session.Store = memorySessionStore{}
 
 func Default() session.Store {
-	c := cache.New(5*time.Minute, 10*time.Minute)
 	k := snowflake.New(0)
+	return New(k)
+}
 
+func New(k generators.IDGenerator) session.Store {
+	c := cache.New(5*time.Minute, 10*time.Minute)
 	return memorySessionStore{
 		keyGenerator:k,
 		cache:c,
 	}
 }
 
+
 type memorySessionStore struct {
 	cache     *cache.Cache
-	keyGenerator session.IDGenerator
+	keyGenerator generators.IDGenerator
 }
 
 func (sm memorySessionStore) GetNew() session.Session {
@@ -37,7 +42,23 @@ func (sm memorySessionStore) GetNew() session.Session {
 
 func (sm memorySessionStore) Get(id string) (session.Session, bool) {
 	s, e := sm.cache.Get(id)
-	return s.(session.Session), e
+	if e {
+		return s.(session.Session),true
+	}
+
+	return nil, false
+}
+
+func (sm memorySessionStore) Count() int {
+	return sm.cache.ItemCount()
+}
+
+func (sm memorySessionStore) Sessions() session.SessionMap {
+	 m := make(session.SessionMap)
+	for k, v := range sm.cache.Items() {
+		m[k] = v.Object.(session.Session)
+	}
+	return m
 }
 
 type DefaultSession struct {
@@ -47,3 +68,4 @@ type DefaultSession struct {
 func (s DefaultSession) ID() string {
 	return s.id
 }
+

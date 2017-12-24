@@ -4,6 +4,7 @@ import (
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"sync"
+	"github.com/ezaurum/gin-session"
 )
 
 func TestGetNew(t *testing.T) {
@@ -110,5 +111,24 @@ func TestGetByGoroutine(t *testing.T) {
 	}()
 
 	wg.Wait()
-
 }
+
+func TestQueryAllList(t *testing.T) {
+	sessionCount := 10000
+
+	sm := Default()
+
+	sMap := make(session.SessionMap)
+	for i := 0; i< sessionCount; i++ {
+		ss := sm.GetNew()
+		sMap[ss.ID()] = ss
+	}
+
+	assert.True(t, sessionCount == sm.Count())
+
+	for k, v := range sm.Sessions() {
+		assert.Equal(t, sMap[k], v)
+	}
+}
+
+//TODO 없으면 false 하도록

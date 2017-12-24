@@ -2,12 +2,12 @@ package snowflake
 
 import (
 	"github.com/bwmarrin/snowflake"
-	"github.com/ezaurum/gin-session"
+	"github.com/ezaurum/gin-session/generators"
 )
 
-var _ session.IDGenerator = snowflakeGenerator{}
+var _ generators.IDGenerator = snowflakeGenerator{}
 
-func New(nodeNumber int64) session.IDGenerator {
+func New(nodeNumber int64) generators.IDGenerator {
 	node, err := snowflake.NewNode(nodeNumber)
 	if nil != err {
 		panic(err)
